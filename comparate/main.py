@@ -11,9 +11,9 @@ def obtain_arguments():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('route_csv_truth', type=str, help='Path to CSV file.')
-    parser.add_argument('route_csv_other', type=str, help='Path to CSV file.')
-    parser.add_argument('out', type='str', help='Output path.')
+    parser.add_argument('--route_csv_truth', required=True, type=str, help='Path to CSV file.')
+    parser.add_argument('--route_csv_other', required=True, type=str, help='Path to CSV file.')
+    parser.add_argument('--out', type='str', required=True, help='Output path.')
     parser.add_argument('--route_te', type=str, help='Path to GFF file.')
     parser.add_argument('--threshold_complete_match', type=float, default=.5, help='threshold_complete_match')
     parser.add_argument('--threshold_overlap_match', type=float, default=.2, help='threshold_overlap_match')
