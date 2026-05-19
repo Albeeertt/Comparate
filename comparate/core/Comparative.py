@@ -32,7 +32,7 @@ class Comparate:
         return data
     
 
-    def arranged_dataFrame(self, file: pd.DataFrame):
+    def arranged_dataFrame_function(self, file: pd.DataFrame):
         arranged = defaultdict(lambda: defaultdict(list))
         entire_dataFrame = file[file['type'].isin(['intergenic_region', 'gene'])]
         for record in entire_dataFrame.to_dict(orient='records'):
@@ -95,7 +95,7 @@ class Comparate:
         new_record_complete = {'Mode': 'complete_match', 'chr': 'all',  'gene_truth': 0, 'gen_within_ir': 0}
         new_record_overlap = {'Mode': 'overlap_match', 'chr': 'all', 'gene_truth': 0, 'gen_within_ir': 0}
 
-        arranged_dataFrame = self.arranged_dataFrame(self.truth_file_read)
+        arranged_dataFrame = self.arranged_dataFrame_function(self.truth_file_read)
         list_complete_match, list_overlap_match = self.capture_complete_and_overlap(arranged_dataFrame, self.other_file_read)
         result_complete_different_gene, result_complete_more_than_one = self.comparate_complete_match(list_complete_match)
         result_overlap_different_gene, result_overlap_more_than_one = self.comparate_overlap_match(list_overlap_match)
@@ -111,7 +111,7 @@ class Comparate:
     def comparate_chrs(self):
         chrs_in_file = np.unique(self.other_file_read['chr'])
         results_chrs = []
-        arranged_dataFrame = self.arranged_dataFrame(self.truth_file_read)
+        arranged_dataFrame = self.arranged_dataFrame_function(self.truth_file_read)
         otherFile_dataFrame = self.other_file_read
         for key_chr in chrs_in_file:
             new_record_complete = {'Mode': 'complete_match', 'chr': key_chr,  'gene_truth': 0, 'gen_within_ir': 0}
