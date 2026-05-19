@@ -3,7 +3,7 @@ import os
 import argparse
 import pandas as pd
 
-from comparate.comparate.core.HandleFile import HandleFile
+from comparate.core.HandleFile import HandleFile
 from comparate.core.Comparative import Comparate
 
 
