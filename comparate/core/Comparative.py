@@ -26,7 +26,7 @@ class Comparate:
           Additionally, add the old_idx column, indicating the location of each sample 
           in the original dataframe (for future modifications).
         '''
-        data = pd.read_csv(route, comment='#', sep='\t', header=None, encoding= encoding)
+        data = pd.read_csv(route, index_col=0, encoding= encoding)
         data.columns = ['chr','db','type','start','end','score','strand','phase','attributes', 'Result', 'prob_gene', 'prob_intergenic_region']
         data['old_idx'] = data.index
         data['strand'] = data['strand'].replace('.', '+')
