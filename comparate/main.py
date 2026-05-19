@@ -11,12 +11,12 @@ def obtain_arguments():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('route_csv_truth', type=str, required=True, help='Path to CSV file.')
-    parser.add_argument('route_csv_other', type=str, required=True, help='Path to CSV file.')
-    parser.add_argument('route_te', type=str, required=True, help='Path to GFF file.')
-    parser.add_argument('out', type='str', required=True, help='Output path.')
-    parser.add_argument('threshold_complete_match', type=float, default=.5, help='threshold_complete_match')
-    parser.add_argument('threshold_overlap_match', type=float, default=.2, help='threshold_overlap_match')
+    parser.add_argument('route_csv_truth', type=str, help='Path to CSV file.')
+    parser.add_argument('route_csv_other', type=str, help='Path to CSV file.')
+    parser.add_argument('out', type='str', help='Output path.')
+    parser.add_argument('--route_te', type=str, help='Path to GFF file.')
+    parser.add_argument('--threshold_complete_match', type=float, default=.5, help='threshold_complete_match')
+    parser.add_argument('--threshold_overlap_match', type=float, default=.2, help='threshold_overlap_match')
     return parser.parse_args()
 
 def execute_main_program():
