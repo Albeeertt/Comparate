@@ -43,10 +43,13 @@ class HandleFile:
                 if record['Result'] == 'intergenic_region':
                     new_record['correct_ir'] += 1
             
-        new_record['Recall-genes'] = new_record['correct_gene'] / new_record['total_gene']
-        new_record['Recall-ir'] = new_record['correct_ir'] / new_record['total_ir']
+        if new_record['total_gene']:
+            new_record['Recall-genes'] = new_record['correct_gene'] / new_record['total_gene']
+        if new_record['total_ir']:
+            new_record['Recall-ir'] = new_record['correct_ir'] / new_record['total_ir']
 
-        new_record['accuracy'] = (new_record['correct_gene']+new_record['correct_ir'])/(new_record['total_gene']+new_record['total_ir'])
+        if new_record['total_gene']+new_record['total_ir']:
+            new_record['accuracy'] = (new_record['correct_gene']+new_record['correct_ir'])/(new_record['total_gene']+new_record['total_ir'])
         return new_record
     
     def summary_chr(self):
@@ -76,8 +79,11 @@ class HandleFile:
                     if record['Result'] == 'intergenic_region':
                         new_record['correct_ir'] += 1
                     
-            new_record['Recall-genes'] = new_record['correct_gene'] / new_record['total_gene']
-            new_record['Recall-ir'] = new_record['correct_ir'] / new_record['total_ir']
-            new_record['accuracy'] = (new_record['correct_gene']+new_record['correct_ir'])/(new_record['total_gene']+new_record['total_ir'])
+            if new_record['total_gene']:
+                new_record['Recall-genes'] = new_record['correct_gene'] / new_record['total_gene']
+            if new_record['total_ir']:
+                new_record['Recall-ir'] = new_record['correct_ir'] / new_record['total_ir']
+            if new_record['total_gene']+new_record['total_ir']:
+                new_record['accuracy'] = (new_record['correct_gene']+new_record['correct_ir'])/(new_record['total_gene']+new_record['total_ir'])
             list_result_chrs.append(new_record)
         return list_result_chrs
