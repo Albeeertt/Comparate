@@ -101,11 +101,15 @@ class Comparate:
         result_complete_different_gene, result_complete_more_than_one = self.comparate_complete_match(list_complete_match)
         result_overlap_different_gene, result_overlap_more_than_one = self.comparate_overlap_match(list_overlap_match)
         
-        new_record_complete['gene_truth'] = sum(result_complete_different_gene) / len(result_complete_different_gene)
-        new_record_complete['gen_within_ir'] = sum(result_complete_more_than_one) / len(result_complete_more_than_one)
+        if result_complete_different_gene:
+            new_record_complete['gene_truth'] = sum(result_complete_different_gene) / len(result_complete_different_gene)
+        if result_complete_more_than_one:
+            new_record_complete['gen_within_ir'] = sum(result_complete_more_than_one) / len(result_complete_more_than_one)
 
-        new_record_overlap['gene_truth'] = sum(result_overlap_different_gene) / len(result_overlap_different_gene)
-        new_record_overlap['gen_within_ir'] = sum(result_overlap_more_than_one) / len(result_overlap_more_than_one)
+        if result_overlap_different_gene:
+            new_record_overlap['gene_truth'] = sum(result_overlap_different_gene) / len(result_overlap_different_gene)
+        if result_overlap_more_than_one:
+            new_record_overlap['gen_within_ir'] = sum(result_overlap_more_than_one) / len(result_overlap_more_than_one)
 
         return new_record_complete, new_record_overlap
     
@@ -124,11 +128,15 @@ class Comparate:
             result_complete_different_gene, result_complete_more_than_one = self.comparate_complete_match(list_complete_match)
             result_overlap_different_gene, result_overlap_more_than_one = self.comparate_overlap_match(list_overlap_match)
 
-            new_record_complete['gene_truth'] = sum(result_complete_different_gene) / len(result_complete_different_gene)
-            new_record_complete['gen_within_ir'] = sum(result_complete_more_than_one) / len(result_complete_more_than_one)
+            if result_complete_different_gene:
+                new_record_complete['gene_truth'] = sum(result_complete_different_gene) / len(result_complete_different_gene)
+            if result_complete_more_than_one:
+                new_record_complete['gen_within_ir'] = sum(result_complete_more_than_one) / len(result_complete_more_than_one)
 
-            new_record_overlap['gene_truth'] = sum(result_overlap_different_gene) / len(result_overlap_different_gene)
-            new_record_overlap['gen_within_ir'] = sum(result_overlap_more_than_one) / len(result_overlap_more_than_one)
+            if result_overlap_different_gene:
+                new_record_overlap['gene_truth'] = sum(result_overlap_different_gene) / len(result_overlap_different_gene)
+            if result_overlap_more_than_one:
+                new_record_overlap['gen_within_ir'] = sum(result_overlap_more_than_one) / len(result_overlap_more_than_one)
 
             results_chrs.append(new_record_complete)
             results_chrs.append(new_record_overlap)
