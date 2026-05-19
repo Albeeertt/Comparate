@@ -39,6 +39,7 @@ class Comparate:
             if pd.isna(record['prob_gene']):
                 continue
             arranged[record['chr']][record['strand']].append(record)
+        return arranged
 
     def capture_complete_and_overlap(self, arranged_dataFrame, other_file_dataFrame):
         list_complete_match = []
