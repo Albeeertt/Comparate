@@ -38,7 +38,7 @@ class Comparative_TE:
         return data
     
     def obtain_structure_TE(self, value_kimura: float = 1.) -> Dict:
-        structure_te = defaultdict(defaultdict(list))
+        structure_te = defaultdict(lambda: defaultdict(list))
         for record in self.te_file_read.to_dict(orient='records'):
             dict_attributes = { part.split('=')[0]:part.split('=')[1] for part in record['attributes'].split(';')}
             if dict_attributes.get('KIMURA80', -1) != -1:
