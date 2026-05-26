@@ -59,13 +59,12 @@ class Comparative_TE:
             f'prob_mayor_{threshold}': 0,
             f'prob_menor_{threshold}': 0
         }) 
-    
+        structure_te = self.obtain_structure_TE()
         for record in self.truth_file_read.to_dict(orient='records'):
             if pd.isna(record['prob_gene']):
                 continue
 
             tipo_te_lista = []
-            structure_te = self.obtain_structure_TE()
 
             list_records_chr: List[Dict] = structure_te[record['chr']][record['strand']]
             posee_te: bool = False
