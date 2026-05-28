@@ -12,10 +12,10 @@ class Criterion:
         for match in list_match:
             types_match.append(match['type'])
         unique_values = np.unique(types_match)
-        if len(unique_values) == 1:
+        if len(unique_values) == 1 and unique_values[0] == 'intergenic_region':
             return -1
-        elif len(unique_values) > 1:
-            if record['Result'] == 'gene':
+        elif len(unique_values) > 1 or (len(unique_values) == 1 and unique_values[0] == 'gene'):
+            if record['prob_gene'] >= self.threshold_complete_match:
                 return True
             return False
         
@@ -24,9 +24,9 @@ class Criterion:
         for match in list_match:
             types_match.append(match['type'])
         unique_values = np.unique(types_match)
-        if len(unique_values) == 1:
+        if len(unique_values) == 1 and unique_values[0] == 'intergenic_region':
             return -1
-        elif len(unique_values) > 1:
+        elif len(unique_values) > 1 or (len(unique_values) == 1 and unique_values[0] == 'gene'):
             if record['prob_gene'] >= self.threshold_overlap_match:
                 return True
             return False
@@ -40,4 +40,3 @@ class Criterion:
         if record['prob_gene'] >= self.threshold_overlap_match:
             return True
         return False 
-    

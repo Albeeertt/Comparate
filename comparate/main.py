@@ -6,6 +6,7 @@ import pandas as pd
 from comparate.core.HandleFile import HandleFile
 from comparate.core.Comparative import Comparate
 from comparate.core.Comparative_TE import Comparative_TE
+from comparate.core.Comparative_Pseudogene import Comparative_Pseudogene
 
 
 def obtain_arguments():
@@ -18,6 +19,7 @@ def obtain_arguments():
     parser.add_argument('--route_TE_truth', type=str, help='Path to TE (truth CSV) in GFF file.')
     parser.add_argument('--route_TE_other', type=str, help='Path to TE (other CSV) in GFF file.')
     parser.add_argument('--compare', action='store_true', help='compare route_csv_truth and route_csv_other.')
+    parser.add_argument('--route_pseudogene_truth', type=str, help='Path to Pseudogene tr file.')
     parser.add_argument('--threshold_complete_match', type=float, default=.5, help='threshold_complete_match')
     parser.add_argument('--threshold_overlap_match', type=float, default=.2, help='threshold_overlap_match')
     return parser.parse_args()
@@ -45,6 +47,19 @@ def execute_main_program():
     summary_truth.extend(instance_HandleFile_truth.summary_chr())
     pd.DataFrame(summary_truth).to_csv(ROUTE_SUMMARY_TRUTH)
 
+    if args.route_pseudogene_truth:
+        instance_comparative_Pseudogene = Comparative_Pseudogene(args.route_csv_truth, args.route_pseudogene_truth)
+        result_gen_pseudo, result_ir_pseudo = instance_comparative_Pseudogene.comparate_pseudogenes(threshold=.5)
+        instance_comparative_Pseudogene.generate_graph(result_gen_pseudo, "Conteo de los Pseudogenes en genes", f"Pseudogenes en genes ({instance_comparative_Pseudogene.name_truth})")
+        instance_comparative_Pseudogene.generate_graph(result_ir_pseudo, "Conteo de los Pseudogenes en regiones intergénicas", f"Pseudogenes en regiones intergénicas ({instance_comparative_Pseudogene.name_truth})")
+
+        
+    if args.route_TE_truth:
+        instance_comparate_TE = Comparative_TE(args.route_csv_truth, args.route_TE_truth)
+        result_ir_te_unicos, result_gen_te_unicos = instance_comparate_TE.comparate_te()
+        instance_comparate_TE.generate_graph(result_ir_te_unicos, "Conteo de los TE en regiones intergénicas clasificados como gen", f"Elementos transponibles en regiones intergénicas ({instance_comparate_TE.name_truth})", ROUTE_GRAPH_TE_IR)
+        instance_comparate_TE.generate_graph(result_gen_te_unicos, "Conteo de los TE en genes clasificados como gen", f"Elementos transponibles en genes ({instance_comparate_TE.name_truth})", ROUTE_GRAPH_TE_GEN)
+
     if args.route_csv_other:
         instance_HandleFile_other = HandleFile(args.route_csv_other)
         summary_other = []
@@ -63,11 +78,6 @@ def execute_main_program():
 
         pd.DataFrame(comparate_files).to_csv(ROUTE_COMPARATE)
 
-    if args.route_TE_truth:
-        instance_comparate_TE = Comparative_TE(args.route_csv_truth, args.route_TE_truth)
-        result_ir_te_unicos, result_gen_te_unicos = instance_comparate_TE.comparate_te()
-        instance_comparate_TE.generate_graph(result_ir_te_unicos, "Conteo de los TE en regiones intergénicas clasificados como gen", f"Elementos transponibles en regiones intergénicas ({instance_comparate_TE.name_truth})", ROUTE_GRAPH_TE_IR)
-        instance_comparate_TE.generate_graph(result_gen_te_unicos, "Conteo de los TE en genes clasificados como gen", f"Elementos transponibles en genes ({instance_comparate_TE.name_truth})", ROUTE_GRAPH_TE_GEN)
     if args.route_csv_other and args.route_TE_other:
         instance_comparate_TE = Comparative_TE(args.route_csv_other, args.route_TE_other)
         result_ir_te_unicos, result_gen_te_unicos = instance_comparate_TE.comparate_te()
