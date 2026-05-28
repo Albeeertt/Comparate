@@ -40,6 +40,8 @@ def execute_main_program():
     ROUTE_GRAPH_TE_GEN = route_out+'te_gen_truth.png'
     ROUTE_GRAPH_TE_IR_OTHER = route_out+'te_ir_other.png'
     ROUTE_GRAPH_TE_GEN_OTHER = route_out+'te_gen_other.png'
+    ROUTE_GRAPH_PSEUDO_IR = route_out+'pseudogene_ir.png'
+    ROUTE_GRAPH_PSEUDO_GENES = route_out+'pseudogene_gen.png'
         
     instance_HandleFile_truth = HandleFile(args.route_csv_truth)
     summary_truth = []
@@ -50,8 +52,8 @@ def execute_main_program():
     if args.route_pseudogene_truth:
         instance_comparative_Pseudogene = Comparative_Pseudogene(args.route_csv_truth, args.route_pseudogene_truth)
         result_gen_pseudo, result_ir_pseudo = instance_comparative_Pseudogene.comparate_pseudogenes(threshold=.5)
-        instance_comparative_Pseudogene.generate_graph(result_gen_pseudo, "Conteo de los Pseudogenes en genes", f"Pseudogenes en genes ({instance_comparative_Pseudogene.name_truth})")
-        instance_comparative_Pseudogene.generate_graph(result_ir_pseudo, "Conteo de los Pseudogenes en regiones intergénicas", f"Pseudogenes en regiones intergénicas ({instance_comparative_Pseudogene.name_truth})")
+        instance_comparative_Pseudogene.generate_graph(result_gen_pseudo, "Conteo de los Pseudogenes en genes", f"Pseudogenes en genes ({instance_comparative_Pseudogene.name_truth})", ROUTE_GRAPH_PSEUDO_IR)
+        instance_comparative_Pseudogene.generate_graph(result_ir_pseudo, "Conteo de los Pseudogenes en regiones intergénicas", f"Pseudogenes en regiones intergénicas ({instance_comparative_Pseudogene.name_truth})", ROUTE_GRAPH_PSEUDO_GENES)
 
         
     if args.route_TE_truth:
