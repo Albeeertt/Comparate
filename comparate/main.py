@@ -76,7 +76,7 @@ def execute_main_program():
         comparate_files.append(complete)
         comparate_files.append(overlap)
 
-        comparate_files.extend(instance_comparate.comparate_chrs())
+        # comparate_files.extend(instance_comparate.comparate_chrs())
 
         pd.DataFrame(comparate_files).to_csv(ROUTE_COMPARATE)
 

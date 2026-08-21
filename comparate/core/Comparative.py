@@ -33,12 +33,12 @@ class Comparate:
     
 
     def arranged_dataFrame_function(self, file: pd.DataFrame):
-        arranged = defaultdict(lambda: defaultdict(list))
+        arranged = defaultdict(list)
         entire_dataFrame = file[file['type'].isin(['intergenic_region', 'gene'])]
         for record in entire_dataFrame.to_dict(orient='records'):
             if pd.isna(record['prob_gene']):
                 continue
-            arranged[record['chr']][record['strand']].append(record)
+            arranged[record['chr']].append(record)
         return arranged
 
     def capture_complete_and_overlap(self, arranged_dataFrame, other_file_dataFrame):
@@ -48,7 +48,7 @@ class Comparate:
         for record in entireOther_dataFrame.to_dict(orient='records'):
             if pd.isna(record['prob_gene']):
                 continue
-            list_indicated = arranged_dataFrame[record['chr']][record['strand']]
+            list_indicated = arranged_dataFrame[record['chr']]
             list_complete = []
             list_overlap = []
             for perharps_overlap in list_indicated:
@@ -62,83 +62,113 @@ class Comparate:
         return list_complete_match, list_overlap_match
     
     def comparate_complete_match(self, list_complete_match):
-        result_more_than_one = []
+        result_more_than_one_gene = []
+        result_more_than_one_ir = []
         result_different_gene = []
+        result_different_ir = []
 
         for record, complete_match in list_complete_match:
             if len(complete_match) == 1 and complete_match[0]['type'] != record['type']:
                 if record['type'] == 'intergenic_region' and complete_match[0]['type'] == 'gene':
                     result_different_gene.append(self.instance_criterion.single_complete_match_gene(record))
+                elif record['type'] == 'gene' and complete_match[0]['type'] == 'intergenic_region':
+                    result_different_ir.append(self.instance_criterion.single_complete_match_ir(record))
             elif len(complete_match) > 1:
-                result_multiple_match = self.instance_criterion.multiple_complete_match(record, complete_match)
+                result_multiple_match, type_match = self.instance_criterion.multiple_complete_match(record, complete_match)
                 if result_multiple_match != -1:
-                    result_more_than_one.append(result_multiple_match)
+                    if type_match == 'gene':
+                        result_more_than_one_gene.append(result_multiple_match)
+                    else:
+                        result_more_than_one_ir.append(result_multiple_match)
 
-        return result_different_gene, result_more_than_one
+        return result_different_gene, result_more_than_one_gene, result_different_ir, result_more_than_one_ir 
 
     
     def comparate_overlap_match(self, list_overlap_match):
-        result_more_than_one = []
+        result_more_than_one_gene = []
+        result_more_than_one_ir = []
         result_different_gene = []
+        result_different_ir = []
 
         for record, complete_match in list_overlap_match:
             if len(complete_match) == 1 and complete_match[0]['type'] != record['type']:
                 if record['type'] == 'intergenic_region' and complete_match[0]['type'] == 'gene':
                     result_different_gene.append(self.instance_criterion.single_overlap_match_gene(record))
+                elif record['type'] == 'gene' and complete_match[0]['type'] == 'intergenic_region':
+                    result_different_ir.append(self.instance_criterion.single_overlap_match_ir(record))
             elif len(complete_match) > 1:
-                result_multiple_match = self.instance_criterion.multiple_overlap_match(record, complete_match)
+                result_multiple_match, type_match = self.instance_criterion.multiple_overlap_match(record, complete_match)
                 if result_multiple_match != -1:
-                    result_more_than_one.append(result_multiple_match)
+                    if type_match == 'gene':
+                        result_more_than_one_gene.append(result_multiple_match)
+                    else:
+                        result_more_than_one_ir.append(result_multiple_match)
         
-        return result_different_gene, result_more_than_one
+        return result_different_gene, result_more_than_one_gene, result_different_ir, result_more_than_one_ir
 
     def comparate_files(self):
-        new_record_complete = {'Mode': 'complete_match', 'chr': 'all',  'gene_truth': 0, 'gen_within_ir': 0}
-        new_record_overlap = {'Mode': 'overlap_match', 'chr': 'all', 'gene_truth': 0, 'gen_within_ir': 0}
+        new_record_complete = {'Mode': 'complete_match', 'chr': 'all',  'COMPLETE_detect_only_gen': 0, 'COMPLETE_detect_gen_no_multiple': 0, 'COMPLETE_detect_only_ir': 0, 'COMPLETE_detect_ir_no_multiple': 0, 'TOTAL_detect_only_gen': 0, 'TOTAL_detect_gen_no_multiple': 0, 'TOTAL_detect_only_ir': 0, 'TOTAL_detect_ir_no_multiple': 0}
+        new_record_overlap = {'Mode': 'overlap_match', 'chr': 'all', 'OVERLAP_detect_only_gen': 0, 'OVERLAP_detect_gen_no_multiple': 0, 'OVERLAP_detect_only_ir': 0, 'OVERLAP_detect_ir_no_multiple': 0, 'TOTAL_detect_only_gen': 0, 'TOTAL_detect_gen_no_multiple': 0, 'TOTAL_detect_only_ir': 0, 'TOTAL_detect_ir_no_multiple': 0}
 
         arranged_dataFrame = self.arranged_dataFrame_function(self.truth_file_read)
         list_complete_match, list_overlap_match = self.capture_complete_and_overlap(arranged_dataFrame, self.other_file_read)
-        result_complete_different_gene, result_complete_more_than_one = self.comparate_complete_match(list_complete_match)
-        result_overlap_different_gene, result_overlap_more_than_one = self.comparate_overlap_match(list_overlap_match)
+        result_complete_different_gene, result_complete_more_than_one_gene, result_complete_different_ir, result_complete_more_than_one_ir = self.comparate_complete_match(list_complete_match)
+        result_overlap_different_gene, result_overlap_more_than_one_gene, result_overlap_different_ir, result_overlap_more_than_one_ir = self.comparate_overlap_match(list_overlap_match)
         
         if result_complete_different_gene:
-            new_record_complete['gene_truth'] = sum(result_complete_different_gene) / len(result_complete_different_gene)
-        if result_complete_more_than_one:
-            new_record_complete['gen_within_ir'] = sum(result_complete_more_than_one) / len(result_complete_more_than_one)
+            new_record_complete['COMPLETE_detect_only_gen'] = sum(result_complete_different_gene) / len(result_complete_different_gene)
+            new_record_complete['TOTAL_detect_only_gen'] = len(result_complete_different_gene)
+        if result_complete_more_than_one_gene:
+            new_record_complete['COMPLETE_detect_gen_no_multiple'] = sum(result_complete_more_than_one_gene) / len(result_complete_more_than_one_gene)
+            new_record_complete['TOTAL_detect_gen_no_multiple'] = len(result_complete_more_than_one_gene)
+        if result_complete_different_ir:
+            new_record_complete['COMPLETE_detect_only_ir'] = sum(result_complete_different_ir) / len(result_complete_different_ir)
+            new_record_complete['TOTAL_detect_only_ir'] = len(result_complete_different_ir)
+        if result_complete_more_than_one_ir:
+            new_record_complete['COMPLETE_detect_ir_no_multiple'] = sum(result_complete_more_than_one_ir) / len(result_complete_more_than_one_ir)
+            new_record_complete['TOTAL_detect_ir_no_multiple'] = len(result_complete_more_than_one_ir)
 
         if result_overlap_different_gene:
-            new_record_overlap['gene_truth'] = sum(result_overlap_different_gene) / len(result_overlap_different_gene)
-        if result_overlap_more_than_one:
-            new_record_overlap['gen_within_ir'] = sum(result_overlap_more_than_one) / len(result_overlap_more_than_one)
+            new_record_overlap['OVERLAP_detect_only_gen'] = sum(result_overlap_different_gene) / len(result_overlap_different_gene)
+            new_record_overlap['TOTAL_detect_only_gen'] = len(result_overlap_different_gene)
+        if result_overlap_more_than_one_gene:
+            new_record_overlap['OVERLAP_detect_gen_no_multiple'] = sum(result_overlap_more_than_one_gene) / len(result_overlap_more_than_one_gene)
+            new_record_overlap['TOTAL_detect_gen_no_multiple'] = len(result_overlap_more_than_one_gene)
+        if result_overlap_different_ir:
+            new_record_overlap['OVERLAP_detect_only_ir'] = sum(result_overlap_different_ir) / len(result_overlap_different_ir)
+            new_record_overlap['TOTAL_detect_only_ir'] = len(result_overlap_different_ir)
+        if result_overlap_more_than_one_ir:
+            new_record_overlap['OVERLAP_detect_ir_no_multiple'] = sum(result_overlap_more_than_one_ir) / len(result_overlap_more_than_one_ir)
+            new_record_overlap['TOTAL_detect_ir_no_multiple'] = len(result_overlap_more_than_one_ir)
 
         return new_record_complete, new_record_overlap
     
-    def comparate_chrs(self):
-        chrs_in_file = np.unique(self.other_file_read['chr'])
-        results_chrs = []
-        arranged_dataFrame = self.arranged_dataFrame_function(self.truth_file_read)
-        otherFile_dataFrame = self.other_file_read
-        for key_chr in chrs_in_file:
-            new_record_complete = {'Mode': 'complete_match', 'chr': key_chr,  'gene_truth': 0, 'gen_within_ir': 0}
-            new_record_overlap = {'Mode': 'overlap_match', 'chr': key_chr, 'gene_truth': 0, 'gen_within_ir': 0}
+    # def comparate_chrs(self):
+    #     chrs_in_file = np.unique(self.other_file_read['chr'])
+    #     results_chrs = []
+    #     arranged_dataFrame = self.arranged_dataFrame_function(self.truth_file_read)
+    #     otherFile_dataFrame = self.other_file_read
+    #     for key_chr in chrs_in_file:
+    #         new_record_complete = {'Mode': 'complete_match', 'chr': key_chr,  'gene_truth': 0, 'gen_within_ir': 0}
+    #         new_record_overlap = {'Mode': 'overlap_match', 'chr': key_chr, 'gene_truth': 0, 'gen_within_ir': 0}
 
-            dataFrame_chr_otherFile = otherFile_dataFrame[otherFile_dataFrame['chr'] == key_chr]
+    #         dataFrame_chr_otherFile = otherFile_dataFrame[otherFile_dataFrame['chr'] == key_chr]
 
-            list_complete_match, list_overlap_match = self.capture_complete_and_overlap(arranged_dataFrame, dataFrame_chr_otherFile)
-            result_complete_different_gene, result_complete_more_than_one = self.comparate_complete_match(list_complete_match)
-            result_overlap_different_gene, result_overlap_more_than_one = self.comparate_overlap_match(list_overlap_match)
+    #         list_complete_match, list_overlap_match = self.capture_complete_and_overlap(arranged_dataFrame, dataFrame_chr_otherFile)
+    #         result_complete_different_gene, result_complete_more_than_one = self.comparate_complete_match(list_complete_match)
+    #         result_overlap_different_gene, result_overlap_more_than_one = self.comparate_overlap_match(list_overlap_match)
 
-            if result_complete_different_gene:
-                new_record_complete['gene_truth'] = sum(result_complete_different_gene) / len(result_complete_different_gene)
-            if result_complete_more_than_one:
-                new_record_complete['gen_within_ir'] = sum(result_complete_more_than_one) / len(result_complete_more_than_one)
+    #         if result_complete_different_gene:
+    #             new_record_complete['gene_truth'] = sum(result_complete_different_gene) / len(result_complete_different_gene)
+    #         if result_complete_more_than_one:
+    #             new_record_complete['gen_within_ir'] = sum(result_complete_more_than_one) / len(result_complete_more_than_one)
 
-            if result_overlap_different_gene:
-                new_record_overlap['gene_truth'] = sum(result_overlap_different_gene) / len(result_overlap_different_gene)
-            if result_overlap_more_than_one:
-                new_record_overlap['gen_within_ir'] = sum(result_overlap_more_than_one) / len(result_overlap_more_than_one)
+    #         if result_overlap_different_gene:
+    #             new_record_overlap['gene_truth'] = sum(result_overlap_different_gene) / len(result_overlap_different_gene)
+    #         if result_overlap_more_than_one:
+    #             new_record_overlap['gen_within_ir'] = sum(result_overlap_more_than_one) / len(result_overlap_more_than_one)
 
-            results_chrs.append(new_record_complete)
-            results_chrs.append(new_record_overlap)
+    #         results_chrs.append(new_record_complete)
+    #         results_chrs.append(new_record_overlap)
 
-        return results_chrs
+    #     return results_chrs
