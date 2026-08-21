@@ -113,7 +113,7 @@ class Comparate:
         arranged_dataFrame = self.arranged_dataFrame_function(self.truth_file_read)
         list_complete_match, list_overlap_match = self.capture_complete_and_overlap(arranged_dataFrame, self.other_file_read)
         result_complete_different_gene, result_complete_more_than_one_gene, result_complete_different_ir, result_complete_more_than_one_ir = self.comparate_complete_match(list_complete_match)
-        result_overlap_different_gene, result_overlap_more_than_one_gene, result_overlap_different_ir, result_overlap_more_than_one_ir = self.comparate_overlap_match(list_overlap_match)
+        # result_overlap_different_gene, result_overlap_more_than_one_gene, result_overlap_different_ir, result_overlap_more_than_one_ir = self.comparate_overlap_match(list_overlap_match)
         
         if result_complete_different_gene:
             new_record_complete['COMPLETE_detect_only_gen'] = sum(result_complete_different_gene) / len(result_complete_different_gene)
@@ -128,18 +128,18 @@ class Comparate:
             new_record_complete['COMPLETE_detect_ir_no_multiple'] = sum(result_complete_more_than_one_ir) / len(result_complete_more_than_one_ir)
             new_record_complete['TOTAL_detect_ir_no_multiple'] = len(result_complete_more_than_one_ir)
 
-        if result_overlap_different_gene:
-            new_record_overlap['OVERLAP_detect_only_gen'] = sum(result_overlap_different_gene) / len(result_overlap_different_gene)
-            new_record_overlap['TOTAL_detect_only_gen'] = len(result_overlap_different_gene)
-        if result_overlap_more_than_one_gene:
-            new_record_overlap['OVERLAP_detect_gen_no_multiple'] = sum(result_overlap_more_than_one_gene) / len(result_overlap_more_than_one_gene)
-            new_record_overlap['TOTAL_detect_gen_no_multiple'] = len(result_overlap_more_than_one_gene)
-        if result_overlap_different_ir:
-            new_record_overlap['OVERLAP_detect_only_ir'] = sum(result_overlap_different_ir) / len(result_overlap_different_ir)
-            new_record_overlap['TOTAL_detect_only_ir'] = len(result_overlap_different_ir)
-        if result_overlap_more_than_one_ir:
-            new_record_overlap['OVERLAP_detect_ir_no_multiple'] = sum(result_overlap_more_than_one_ir) / len(result_overlap_more_than_one_ir)
-            new_record_overlap['TOTAL_detect_ir_no_multiple'] = len(result_overlap_more_than_one_ir)
+        # if result_overlap_different_gene:
+        #     new_record_overlap['OVERLAP_detect_only_gen'] = sum(result_overlap_different_gene) / len(result_overlap_different_gene)
+        #     new_record_overlap['TOTAL_detect_only_gen'] = len(result_overlap_different_gene)
+        # if result_overlap_more_than_one_gene:
+        #     new_record_overlap['OVERLAP_detect_gen_no_multiple'] = sum(result_overlap_more_than_one_gene) / len(result_overlap_more_than_one_gene)
+        #     new_record_overlap['TOTAL_detect_gen_no_multiple'] = len(result_overlap_more_than_one_gene)
+        # if result_overlap_different_ir:
+        #     new_record_overlap['OVERLAP_detect_only_ir'] = sum(result_overlap_different_ir) / len(result_overlap_different_ir)
+        #     new_record_overlap['TOTAL_detect_only_ir'] = len(result_overlap_different_ir)
+        # if result_overlap_more_than_one_ir:
+        #     new_record_overlap['OVERLAP_detect_ir_no_multiple'] = sum(result_overlap_more_than_one_ir) / len(result_overlap_more_than_one_ir)
+        #     new_record_overlap['TOTAL_detect_ir_no_multiple'] = len(result_overlap_more_than_one_ir)
 
         return new_record_complete, new_record_overlap
     
