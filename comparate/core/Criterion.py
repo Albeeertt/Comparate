@@ -16,7 +16,7 @@ class Criterion:
             if record['prob_intergenic_region'] >= self.threshold_complete_match:
                 return True, 'intergenic_region'
             return False, 'intergenic_region'
-        elif len(unique_values) > 1 or (len(unique_values) == 1 and unique_values[0] == 'gene' and unique_values[0] != record['type']):
+        elif record['type'] == 'intergenic_region' and (len(unique_values) > 1 or (len(unique_values) == 1 and unique_values[0] == 'gene' and unique_values[0] != record['type'])):
             if record['prob_gene'] >= self.threshold_complete_match:
                 return True, 'gene'
             return False, 'gene'
