@@ -22,6 +22,8 @@ def obtain_arguments():
     parser.add_argument('--route_pseudogene_truth', type=str, help='Path to Pseudogene tr file.')
     parser.add_argument('--threshold_complete_match', type=float, default=.5, help='threshold_complete_match')
     parser.add_argument('--threshold_overlap_match', type=float, default=.2, help='threshold_overlap_match')
+    parser.add_argument('--check_strand', action='store_true',
+                    help='exige misma hebra al emparejar (para ficheros sin colapsar)')
     return parser.parse_args()
 
 def execute_main_program():
@@ -70,7 +72,7 @@ def execute_main_program():
         pd.DataFrame(summary_other).to_csv(ROUTE_SUMMARY_OTHER)
 
     if args.route_csv_other and args.compare:
-        instance_comparate = Comparate(args.route_csv_truth, args.route_csv_other, threshold_complete_match=args.threshold_complete_match, threshold_overlap_match=args.threshold_overlap_match)
+        instance_comparate = Comparate(args.route_csv_truth, args.route_csv_other, threshold_complete_match=args.threshold_complete_match, threshold_overlap_match=args.threshold_overlap_match, check_strand=args.check_strand)
         comparate_files = []
         complete, overlap = instance_comparate.comparate_files()
         comparate_files.append(complete)

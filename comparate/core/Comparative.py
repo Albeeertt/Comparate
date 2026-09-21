@@ -8,11 +8,12 @@ from .Criterion import Criterion
 
 class Comparate:
 
-    def __init__(self, route_truth: str, route_other: str, threshold_complete_match, threshold_overlap_match):
+    def __init__(self, route_truth: str, route_other: str, threshold_complete_match, threshold_overlap_match, check_strand: bool = False):
         self.name_truth = route_truth.split('/')[-1]
         self.route_truth = route_truth
         self.name_other = route_other.split('/')[-1]
         self.route_other = route_other
+        self.check_strand = check_strand
 
         self.truth_file_read = self.obtain_gff(route_truth)
         self.other_file_read = self.obtain_gff(route_other)
@@ -30,7 +31,9 @@ class Comparate:
         data['old_idx'] = data.index
         data['strand'] = data['strand'].replace('.', '+')
         return data
-    
+
+    def _key(self, record):
+        return (record['chr'], record['strand']) if self.check_strand else record['chr']
 
     def arranged_dataFrame_function(self, file: pd.DataFrame):
         arranged = defaultdict(list)
@@ -38,7 +41,7 @@ class Comparate:
         for record in entire_dataFrame.to_dict(orient='records'):
             if pd.isna(record['prob_gene']):
                 continue
-            arranged[record['chr']].append(record)
+            arranged[self._key(record)].append(record)
         return arranged
 
     def capture_complete_and_overlap(self, arranged_dataFrame, other_file_dataFrame):
@@ -48,7 +51,7 @@ class Comparate:
         for record in entireOther_dataFrame.to_dict(orient='records'):
             if pd.isna(record['prob_gene']):
                 continue
-            list_indicated = arranged_dataFrame[record['chr']]
+            list_indicated = arranged_dataFrame[self._key(record)]
             list_complete = []
             list_overlap = []
             for perharps_overlap in list_indicated:
