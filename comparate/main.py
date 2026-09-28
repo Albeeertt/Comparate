@@ -1,4 +1,3 @@
-
 import os
 import argparse
 import pandas as pd
@@ -38,6 +37,7 @@ def execute_main_program():
     ROUTE_SUMMARY_TRUTH = route_out+'summary_truth.csv'
     ROUTE_SUMMARY_OTHER = route_out+'summary_other.csv'
     ROUTE_COMPARATE = route_out+'comparate.csv'
+    ROUTE_REGIONES = route_out+'regiones_gen_ausente.csv'
     ROUTE_GRAPH_TE_IR = route_out+'te_ir_truth.png'
     ROUTE_GRAPH_TE_GEN = route_out+'te_gen_truth.png'
     ROUTE_GRAPH_TE_IR_OTHER = route_out+'te_ir_other.png'
@@ -81,6 +81,15 @@ def execute_main_program():
         # comparate_files.extend(instance_comparate.comparate_chrs())
 
         pd.DataFrame(comparate_files).to_csv(ROUTE_COMPARATE)
+
+        # una fila por región intergénica de 'other' con al menos un gen de 'truth' dentro
+        detalle = instance_comparate.detalle_regiones
+        detalle.to_csv(ROUTE_REGIONES, index=False)
+        if len(detalle):
+            for cat in ('only_gen', 'gen_no_multiple'):
+                d = detalle[detalle['categoria'] == cat]
+                if len(d):
+                    print(f"{cat}: {d['capturado'].mean()} - {len(d)}")
 
     if args.route_csv_other and args.route_TE_other:
         instance_comparate_TE = Comparative_TE(args.route_csv_other, args.route_TE_other)

@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 from collections import defaultdict
@@ -109,12 +108,52 @@ class Comparate:
         
         return result_different_gene, result_more_than_one_gene, result_different_ir, result_more_than_one_ir
 
+    def detalle_gen_ausente(self, list_complete_match):
+        '''
+        - Una fila por cada región intergénica de 'other' que contiene por completo al menos un gen
+          de 'truth'. Son exactamente las regiones que cuentan en COMPLETE_detect_only_gen
+          (una sola feature contenida, que es un gen) y en COMPLETE_detect_gen_no_multiple
+          (varias features contenidas, al menos un gen). Cada región cuenta una vez, tenga los
+          genes que tenga.
+        '''
+        filas = []
+        for record, complete_match in list_complete_match:
+            if record['type'] != 'intergenic_region':
+                continue
+            genes = sorted(((m['start'], m['end']) for m in complete_match if m['type'] == 'gene'))
+            if not genes:
+                continue
+            # longitud génica = unión de los genes contenidos (por si se solapan entre sí)
+            union, (ini, fin) = 0, genes[0]
+            for s_, e_ in genes[1:]:
+                if s_ <= fin:
+                    fin = max(fin, e_)
+                else:
+                    union += fin - ini + 1
+                    ini, fin = s_, e_
+            union += fin - ini + 1
+            longitud_region = record['end'] - record['start'] + 1
+            filas.append({
+                'chr': record['chr'], 'start': record['start'], 'end': record['end'],
+                'old_idx': record['old_idx'],
+                'categoria': 'only_gen' if len(complete_match) == 1 else 'gen_no_multiple',
+                'n_features_contenidas': len(complete_match),
+                'n_genes_contenidos': len(genes),
+                'longitud_region': longitud_region,
+                'longitud_genica': union,
+                'fraccion_gen': union / longitud_region,
+                'prob_gene': record['prob_gene'],
+                'capturado': bool(record['prob_gene'] >= self.instance_criterion.threshold_complete_match),
+            })
+        return pd.DataFrame(filas)
+
     def comparate_files(self):
         new_record_complete = {'Mode': 'complete_match', 'chr': 'all',  'COMPLETE_detect_only_gen': 0, 'COMPLETE_detect_gen_no_multiple': 0, 'COMPLETE_detect_only_ir': 0, 'COMPLETE_detect_ir_no_multiple': 0, 'TOTAL_detect_only_gen': 0, 'TOTAL_detect_gen_no_multiple': 0, 'TOTAL_detect_only_ir': 0, 'TOTAL_detect_ir_no_multiple': 0}
         new_record_overlap = {'Mode': 'overlap_match', 'chr': 'all', 'OVERLAP_detect_only_gen': 0, 'OVERLAP_detect_gen_no_multiple': 0, 'OVERLAP_detect_only_ir': 0, 'OVERLAP_detect_ir_no_multiple': 0, 'TOTAL_detect_only_gen': 0, 'TOTAL_detect_gen_no_multiple': 0, 'TOTAL_detect_only_ir': 0, 'TOTAL_detect_ir_no_multiple': 0}
 
         arranged_dataFrame = self.arranged_dataFrame_function(self.truth_file_read)
         list_complete_match, list_overlap_match = self.capture_complete_and_overlap(arranged_dataFrame, self.other_file_read)
+        self.detalle_regiones = self.detalle_gen_ausente(list_complete_match)
         result_complete_different_gene, result_complete_more_than_one_gene, result_complete_different_ir, result_complete_more_than_one_ir = self.comparate_complete_match(list_complete_match)
         # result_overlap_different_gene, result_overlap_more_than_one_gene, result_overlap_different_ir, result_overlap_more_than_one_ir = self.comparate_overlap_match(list_overlap_match)
         
